@@ -4,11 +4,13 @@
 class Api::V1::TasksController < ApplicationController
   before_action :set_task, only: %i[update destroy]
 
+  # GET /api/v1/tasks
   def index
     tasks = Task.order(created_at: :desc)
     render json: { success: true, data: get_tasks_response(tasks), status: :ok }
   end
 
+  # POST /api/v1/tasks
   def create
     task = Task.new(task_params)
     if task.save
@@ -18,6 +20,7 @@ class Api::V1::TasksController < ApplicationController
     end
   end
 
+  # PATCH /api/v1/tasks/:id
   def update
     begin
       @task.update(update_task_status_params)
@@ -27,6 +30,7 @@ class Api::V1::TasksController < ApplicationController
     end
   end
 
+  # DELETE /api/v1/tasks/:id
   def destroy
     if @task.destroy
       render json: { success: true, message: 'Task Deleted', status: :ok }
@@ -37,10 +41,12 @@ class Api::V1::TasksController < ApplicationController
 
   private
 
+  # get serialized response for task
   def get_task_response(task)
     ActiveModelSerializers::SerializableResource.new(task, serializer: TaskSerializer)
   end
 
+  # get serialized response for tasks
   def get_tasks_response(tasks)
     ActiveModelSerializers::SerializableResource.new(tasks, each_serializer: TaskSerializer)
   end
