@@ -11,6 +11,7 @@ RSpec.describe "Tasks", type: :request do
     it "fetches tasks successfully" do
       expected_response = {
         "success" => true,
+        "status" => "ok",
         "data" => [
           {
             "id" => tasks.second.id,
@@ -65,6 +66,7 @@ RSpec.describe "Tasks", type: :request do
         it "returns error" do
           expected_response = {
             "success" => false,
+            "status" => "unprocessable_entity",
             "message" => "Title can't be blank"
           }
 
@@ -82,6 +84,7 @@ RSpec.describe "Tasks", type: :request do
         it "returns error" do
           expected_response = {
             "success" => false,
+            "status" => "unprocessable_entity",
             "message" => "To do tasks limit has reached"
           }
 
@@ -97,7 +100,11 @@ RSpec.describe "Tasks", type: :request do
       before { patch "/api/v1/tasks/1000", params: { task: task_params } }
 
       it "returns error" do
-        expect(JSON.parse(response.body)).to eq({ "message" => 'Task not found!' })
+        expected_response = {
+          "message" => 'Task not found!', "status" => "bad_request"
+        }
+
+        expect(JSON.parse(response.body)).to eq(expected_response)
       end
     end
 
@@ -119,6 +126,7 @@ RSpec.describe "Tasks", type: :request do
       it "returns error" do
         expected_response = {
           "success" => false,
+          "status" => "unprocessable_entity",
           "message" => "'test' is not a valid status"
         }
 

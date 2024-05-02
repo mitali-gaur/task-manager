@@ -6,32 +6,32 @@ class Api::V1::TasksController < ApplicationController
 
   def index
     tasks = Task.order(created_at: :desc)
-    render json: { success: true, data: get_tasks_response(tasks) }
+    render json: { success: true, data: get_tasks_response(tasks), status: :ok }
   end
 
   def create
     task = Task.new(task_params)
     if task.save
-      render json: { success: true, data: get_task_response(task) }
+      render json: { success: true, data: get_task_response(task), status: :ok }
     else
-      render json: { success: false, message: task.errors.full_messages.join(', ') }
+      render json: { success: false, message: task.errors.full_messages.join(', '), status: :unprocessable_entity }
     end
   end
 
   def update
     begin
       @task.update(update_task_status_params)
-      render json: { success: true, data: get_task_response(@task) }
+      render json: { success: true, data: get_task_response(@task), status: :ok }
     rescue => e
-      render json: { success: false, message: e.message }
+      render json: { success: false, message: e.message, status: :unprocessable_entity }
     end
   end
 
   def destroy
     if @task.destroy
-      render json: { success: true, message: 'Task Deleted' }
+      render json: { success: true, message: 'Task Deleted', status: :ok }
     else
-      render json: { success: false, message: @task.errors.full_messages.join(', ') }
+      render json: { success: false, message: @task.errors.full_messages.join(', '), status: :unprocessable_entity }
     end
   end
 
@@ -55,6 +55,6 @@ class Api::V1::TasksController < ApplicationController
 
   def set_task
     @task = Task.find_by(id: params[:id])
-    return render json: { message: 'Task not found!' } unless @task
+    return render json: { message: 'Task not found!', status: :bad_request } unless @task
   end
 end
